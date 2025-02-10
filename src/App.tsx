@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useAccount, useConnectors, useDisconnect, WagmiProvider } from 'wagmi'
+
 import './App.css'
+import { config } from "../config"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
+
+const client = new QueryClient();
+
+  function  wagmi () {
+    return (
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={client}>
+          <ConnectWallet/>
+        </QueryClientProvider>
+      </WagmiProvider>
+    )
+  }
+
+
+  function ConnectWallet() {
+    const {address}= useAccount();
+    const {disconnect}= useDisconnect();
+
+
+
+
+
+    if(address){
+      return <div>
+        You are connected {address} <button onClick={()=>{
+          disconnect()
+        }}></button>
+      </div>
+    }
+    const connectors=useConnectors();
+     return(
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {connectors.map(c=><button>Connect Via{c.name}</button>)}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+     )
 
-export default App
+    
+     
+     
+    
+
+
+
+
+
+  }
+
+
+
+
+
+
+
+  export default wagmi
+
